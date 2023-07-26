@@ -1,0 +1,38 @@
+name: Build and Deploy
+
+on:
+  push:
+
+env:
+  CI_REGISTRY_AGENT_IMAGE: "${{ secrets.CI_REGISTRY }}/rancher-agent"
+  OS: linux
+  ARCH: amd64
+  RANCHER_VERSION: v2.7.5
+
+jobs:
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login to Beeper Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.CI_REGISTRY }}
+          username: ${{ secrets.CI_REGISTRY_USER }}
+          password: ${{ secrets.CI_REGISTRY_PASSWORD }}
+
+      - name: Build agent binary
+        run: |
+          GOOS=${{ env.OS }} GOARCH=${{ env.ARCH }} scripts/build-agent
+          cp bin/agent package/
+
+      - name: Docker Build
+        uses: docker/build-push-action@v2
+        with:
+          context: package
+          file: package/Dockerfile.agent
+          tags: ${{ env.CI_REGISTRY_AGENT_IMAGE }}:${{ env.RANCHER_VERSION }}-beeper-${{ github.sha }}
+          push: true
+          platforms: ${{ env.OS }}/${{ env.ARCH }}
+          build-args: RANCHER_TAG=${{ env.RANCHER_VERSION }}
