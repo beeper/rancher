@@ -9,6 +9,7 @@ import (
 
 	"github.com/rancher/lasso/pkg/cache"
 	"github.com/rancher/lasso/pkg/controller"
+	"github.com/sirupsen/logrus"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 )
@@ -53,6 +54,7 @@ func defaultTweakListOptions() cache.TweakListOptionsFunc {
 	if globalLabelSelector == "" {
 		return func(*v1.ListOptions) {}
 	}
+	logrus.Infof("Applying global label selector: %s", globalLabelSelector)
 	return func(opts *v1.ListOptions) {
 		opts.LabelSelector = globalLabelSelector
 	}
