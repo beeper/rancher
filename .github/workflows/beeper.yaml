@@ -7,7 +7,7 @@ env:
   CI_REGISTRY_AGENT_IMAGE: "${{ secrets.CI_REGISTRY }}/rancher-agent"
   OS: linux
   ARCH: amd64
-  RANCHER_VERSION: v2.7.5
+  RANCHER_VERSION: v2.7.10
 
 jobs:
   build-docker:
